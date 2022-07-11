@@ -35,7 +35,13 @@ fun main() {
             break
         }
 
-        val (fromValue, from, to) = processInput(input)
+        val parsedInput = processInput(input)
+        if (parsedInput == null) {
+            println("Parse error")
+            continue
+        }
+
+        val (fromValue, from, to) = parsedInput
 
         // error 1: "from" and/or "to" is unknown unit
         if (from == Unit.UNKNOWN || to == Unit.UNKNOWN) {
@@ -91,7 +97,7 @@ fun main() {
 
 // ignore "degree" and "degrees" and the transition word
 // parse first part as Double and interpret the from and to units
-fun processInput(input: String): Triple<Double, Unit, Unit> {
+fun processInput(input: String): Triple<Double, Unit, Unit>? {
     val cleanedInput = input
         .replace("degrees ", "")
         .replace("degree ", "")
@@ -100,7 +106,11 @@ fun processInput(input: String): Triple<Double, Unit, Unit> {
     val from = getNormalizedUnit(fromUnit)
     val to = getNormalizedUnit(toUnit)
 
-    return Triple(fromValue.toDouble(), from, to)
+    return try {
+        Triple(fromValue.toDouble(), from, to)
+    } catch (_: NumberFormatException) {
+        null
+    }
 }
 
 fun getNormalizedUnit(unit :String): Unit {
